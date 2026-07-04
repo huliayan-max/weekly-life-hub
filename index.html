@@ -193,6 +193,9 @@
   .paid-bill { text-decoration: line-through; color: var(--muted); }
   .bal-in { width: 96px; border: 1px solid var(--border); background: var(--bg); color: var(--text); border-radius: 8px; padding: 4px 6px; font-size: 13px; font-weight: 600; text-align: right; outline: none; }
   .bal-in:focus { border-color: var(--accent); }
+  .stackbar { display: flex; height: 9px; border-radius: 6px; overflow: hidden; background: var(--bg); border: 1px solid var(--border); }
+  .stackbar div { height: 100%; }
+  .acct-sep { border-bottom: 1px dashed var(--border); margin: 8px 0; }
 
   /* ---------- reflection ---------- */
   .refl-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
@@ -558,18 +561,42 @@ function renderBills() {
 }
 
 /* ---------- accounts ---------- */
+function stackBar(paid, pending, free) {
+  const total = paid + pending + Math.max(0, free);
+  if (total <= 0) return "";
+  const w = v => (v / total * 100).toFixed(1) + "%";
+  return `<div class="stackbar" title="paid $${paid.toFixed(2)} · upcoming $${pending.toFixed(2)} · free $${Math.max(0, free).toFixed(2)}">
+    ${paid > 0 ? `<div style="width:${w(paid)};background:var(--red)"></div>` : ""}
+    ${pending > 0 ? `<div style="width:${w(pending)};background:var(--amber)"></div>` : ""}
+    ${free > 0 ? `<div style="width:${w(free)};background:var(--green)"></div>` : ""}
+  </div>`;
+}
 function renderAccounts() {
   const mk = monthKey();
   const total = S.accounts.reduce((a, c) => a + c.balance, 0);
   $("acctTotal").textContent = S.accounts.length ? "$" + total.toFixed(2) : "";
-  $("acctList").innerHTML = S.accounts.length ? S.accounts.map(a => {
-    const pending = S.bills.filter(b => b.acct === a.id && b.paidMonth !== mk).reduce((s, b) => s + b.amount, 0);
+  const billsFor = (id, isPaid) => S.bills.filter(b => b.acct === id && (b.paidMonth === mk) === isPaid).reduce((s, b) => s + b.amount, 0);
+  const allPaid = S.accounts.reduce((s, a) => s + billsFor(a.id, true), 0);
+  const allPending = S.accounts.reduce((s, a) => s + billsFor(a.id, false), 0);
+  const overall = (allPaid + allPending) > 0 ? `
+    <div style="font-size:12px;margin-bottom:4px">
+      Bills this month:
+      <b style="color:var(--red)">$${allPaid.toFixed(2)} paid</b> ·
+      <b style="color:var(--amber)">$${allPending.toFixed(2)} upcoming</b> ·
+      <b style="color:var(--green)">$${Math.max(0, total - allPending).toFixed(2)} free</b>
+    </div>
+    ${stackBar(allPaid, allPending, total - allPending)}
+    <div class="acct-sep"></div>` : "";
+  $("acctList").innerHTML = S.accounts.length ? overall + S.accounts.map(a => {
+    const paid = billsFor(a.id, true), pending = billsFor(a.id, false);
     return `
-    <div class="exp">
+    <div class="exp" style="border-bottom:none;padding-bottom:${(paid + pending) > 0 ? "4px" : "0"}">
       <span class="ds">${esc(a.name)}${pending ? ` <span class="dy">🧾 $${pending.toFixed(2)} in bills → $${(a.balance - pending).toFixed(2)} left</span>` : ""}</span>
       <input class="bal-in" data-abal="${a.id}" type="number" step="0.01" value="${a.balance}">
       <button class="x-del" data-adel="${a.id}">×</button>
-    </div>`;
+    </div>
+    ${(paid + pending) > 0 ? stackBar(paid, pending, a.balance - pending) : ""}
+    <div class="acct-sep"></div>`;
   }).join("")
     : `<p style="color:var(--muted);font-size:13px">Add your accounts and update balances whenever you like — the total shows up top. Numbers stay on this device only.</p>`;
 }
