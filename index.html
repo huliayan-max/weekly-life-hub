@@ -193,6 +193,8 @@
   .paid-bill { text-decoration: line-through; color: var(--muted); }
   .bal-in { width: 96px; border: 1px solid var(--border); background: var(--bg); color: var(--text); border-radius: 8px; padding: 4px 6px; font-size: 13px; font-weight: 600; text-align: right; outline: none; }
   .bal-in:focus { border-color: var(--accent); }
+  .bill-acct-sel { border: 1px solid var(--border); background: var(--bg); color: var(--muted); border-radius: 6px; font-size: 11px; padding: 1px 2px; outline: none; max-width: 130px; cursor: pointer; }
+  .bill-acct-sel:focus { border-color: var(--accent); }
   .stackbar { display: flex; height: 9px; border-radius: 6px; overflow: hidden; background: var(--bg); border: 1px solid var(--border); }
   .stackbar div { height: 100%; }
   .acct-sep { border-bottom: 1px dashed var(--border); margin: 8px 0; }
@@ -541,8 +543,9 @@ function renderBills() {
   $("billsSummary").textContent = S.bills.length
     ? (unpaid.length ? "— $" + due.toFixed(2) + " still due this month" : "— all paid this month 🎉") : "";
   const sel = $("billAcct"), prevSel = sel.value;
-  sel.innerHTML = `<option value="">no account</option>` +
-    S.accounts.map(a => `<option value="${a.id}">${esc(a.name)}</option>`).join("");
+  sel.innerHTML = S.accounts.length
+    ? S.accounts.map(a => `<option value="${a.id}">${esc(a.name)}</option>`).join("")
+    : `<option value="">no account yet</option>`;
   if (S.accounts.some(a => a.id === prevSel)) sel.value = prevSel;
   $("billList").innerHTML = S.bills.length ? S.bills.slice().sort((a, b) => a.due - b.due).map(b => {
     const paid = b.paidMonth === mk;
@@ -553,11 +556,20 @@ function renderBills() {
     return `
     <div class="exp">
       <div class="check ${paid ? "on" : ""}" data-bpay="${b.id}" style="width:18px;height:18px;border-radius:6px;font-size:11px" title="Mark paid${acct ? " — deducts from " + esc(acct.name) : ""}">${paid ? "✓" : ""}</div>
-      <span class="ds ${paid ? "paid-bill" : ""}">${esc(b.name)} <span class="dy ${cls}">${note}</span>${acct ? ` <span class="dy">· 🏦 ${esc(acct.name)}</span>` : ""}</span>
+      <span class="ds ${paid ? "paid-bill" : ""}">${esc(b.name)} <span class="dy ${cls}">${note}</span>${S.accounts.length ? ` <select class="bill-acct-sel" data-bacct="${b.id}" title="Paid from this account">${S.accounts.map(a => `<option value="${a.id}"${a.id === b.acct ? " selected" : ""}>🏦 ${esc(a.name)}</option>`).join("")}</select>` : ""}</span>
       <span class="am">$${b.amount.toFixed(2)}</span>
       <button class="x-del" data-bdel="${b.id}">×</button>
     </div>`;
   }).join("") : `<p style="color:var(--muted);font-size:13px">Add your recurring bills — they reset to unpaid each month, and you'll get a warning when one is due soon. Link a bill to an account and paying it updates the balance automatically.</p>`;
+}
+
+function normalizeBillLinks() {
+  if (!S.accounts.length) return;
+  let changed = false;
+  S.bills.forEach(b => {
+    if (!b.acct || !S.accounts.some(a => a.id === b.acct)) { b.acct = S.accounts[0].id; changed = true; }
+  });
+  if (changed) save();
 }
 
 /* ---------- accounts ---------- */
@@ -822,13 +834,18 @@ $("billList").addEventListener("click", e => {
   const del = e.target.closest("[data-bdel]");
   if (del && confirm("Remove this bill?")) { S.bills = S.bills.filter(x => x.id !== del.dataset.bdel); save(); renderBills(); renderAccounts(); }
 });
+$("billList").addEventListener("change", e => {
+  const s = e.target.closest("[data-bacct]");
+  if (s) { S.bills.find(b => b.id === s.dataset.bacct).acct = s.value; save(); renderBills(); renderAccounts(); }
+});
 
 function addAcct() {
   const n = $("acctName").value.trim();
   if (!n) return;
   S.accounts.push({ id: uid(), name: n, balance: +$("acctBal").value || 0 });
   $("acctName").value = ""; $("acctBal").value = "";
-  save(); renderAccounts();
+  normalizeBillLinks();
+  save(); renderAccounts(); renderBills();
 }
 $("acctAdd").onclick = addAcct;
 ["acctName", "acctBal"].forEach(id => $(id).addEventListener("keydown", e => { if (e.key === "Enter") addAcct(); }));
@@ -838,7 +855,7 @@ $("acctList").addEventListener("change", e => {
 });
 $("acctList").addEventListener("click", e => {
   const del = e.target.closest("[data-adel]");
-  if (del && confirm("Remove this account?")) { S.accounts = S.accounts.filter(a => a.id !== del.dataset.adel); save(); renderAccounts(); renderBills(); }
+  if (del && confirm("Remove this account?")) { S.accounts = S.accounts.filter(a => a.id !== del.dataset.adel); normalizeBillLinks(); save(); renderAccounts(); renderBills(); }
 });
 
 [["reflWins", "wins"], ["reflHard", "hard"], ["reflFocus", "focus"]].forEach(([id, k]) => {
@@ -846,6 +863,7 @@ $("acctList").addEventListener("click", e => {
 });
 $("notesArea").addEventListener("input", e => { S.notes = e.target.value; save(); });
 
+normalizeBillLinks();
 renderAll();
 </script>
 </body>
