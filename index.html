@@ -148,6 +148,10 @@
     border-radius: 8px; padding: 7px 10px; font-size: 13px; outline: none;
   }
   .add-inline input:focus { border-color: var(--accent); }
+  .add-inline select {
+    border: 1px solid var(--border); background: var(--bg); color: var(--text);
+    border-radius: 8px; padding: 7px 4px; font-size: 13px; outline: none;
+  }
   .mini-btn {
     border: 1px solid var(--border); background: var(--card); color: var(--accent);
     border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 13px;
@@ -207,6 +211,11 @@
   .arch { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; padding: 10px 12px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; margin-top: 8px; }
   .arch b { color: var(--accent); }
   .arch .aw { color: var(--muted); font-style: italic; }
+  .arch-sum { font-size: 13px; background: var(--accent-soft); border: 1px solid var(--accent); border-radius: 10px; padding: 10px 12px; margin-top: 8px; }
+  details.arch-x summary::-webkit-details-marker { display: none; }
+  summary.arch { cursor: pointer; }
+  .arch-refl { margin: 2px 0 10px; padding: 8px 14px; border-left: 3px solid var(--accent); font-size: 13px; }
+  .arch-refl p { margin: 5px 0; white-space: pre-wrap; }
 </style>
 </head>
 <body>
@@ -297,6 +306,7 @@
         <input id="billName" placeholder="Bill (e.g. Rent, Internet)">
         <input id="billAmt" type="number" min="0" step="0.01" placeholder="$" style="flex:0 0 78px">
         <input id="billDue" type="number" min="1" max="31" placeholder="day" title="Due day of month" style="flex:0 0 62px">
+        <select id="billAcct" title="Pay from account" style="flex:0 0 118px"></select>
         <button class="mini-btn" id="billAdd">Add</button>
       </div>
     </div>
@@ -527,31 +537,40 @@ function renderBills() {
   const due = unpaid.reduce((a, b) => a + b.amount, 0);
   $("billsSummary").textContent = S.bills.length
     ? (unpaid.length ? "— $" + due.toFixed(2) + " still due this month" : "— all paid this month 🎉") : "";
+  const sel = $("billAcct"), prevSel = sel.value;
+  sel.innerHTML = `<option value="">no account</option>` +
+    S.accounts.map(a => `<option value="${a.id}">${esc(a.name)}</option>`).join("");
+  if (S.accounts.some(a => a.id === prevSel)) sel.value = prevSel;
   $("billList").innerHTML = S.bills.length ? S.bills.slice().sort((a, b) => a.due - b.due).map(b => {
     const paid = b.paidMonth === mk;
+    const acct = S.accounts.find(a => a.id === b.acct);
     let cls = "", note = "due " + ord(b.due);
     if (!paid && b.due < today) { cls = "overdue"; note = "overdue — was due " + ord(b.due); }
     else if (!paid && b.due - today <= 7) { cls = "due-soon"; note = "due " + ord(b.due) + " · soon"; }
     return `
     <div class="exp">
-      <div class="check ${paid ? "on" : ""}" data-bpay="${b.id}" style="width:18px;height:18px;border-radius:6px;font-size:11px" title="Mark paid">${paid ? "✓" : ""}</div>
-      <span class="ds ${paid ? "paid-bill" : ""}">${esc(b.name)} <span class="dy ${cls}">${note}</span></span>
+      <div class="check ${paid ? "on" : ""}" data-bpay="${b.id}" style="width:18px;height:18px;border-radius:6px;font-size:11px" title="Mark paid${acct ? " — deducts from " + esc(acct.name) : ""}">${paid ? "✓" : ""}</div>
+      <span class="ds ${paid ? "paid-bill" : ""}">${esc(b.name)} <span class="dy ${cls}">${note}</span>${acct ? ` <span class="dy">· 🏦 ${esc(acct.name)}</span>` : ""}</span>
       <span class="am">$${b.amount.toFixed(2)}</span>
       <button class="x-del" data-bdel="${b.id}">×</button>
     </div>`;
-  }).join("") : `<p style="color:var(--muted);font-size:13px">Add your recurring bills — they reset to unpaid each month, and you'll get a warning when one is due soon.</p>`;
+  }).join("") : `<p style="color:var(--muted);font-size:13px">Add your recurring bills — they reset to unpaid each month, and you'll get a warning when one is due soon. Link a bill to an account and paying it updates the balance automatically.</p>`;
 }
 
 /* ---------- accounts ---------- */
 function renderAccounts() {
+  const mk = monthKey();
   const total = S.accounts.reduce((a, c) => a + c.balance, 0);
   $("acctTotal").textContent = S.accounts.length ? "$" + total.toFixed(2) : "";
-  $("acctList").innerHTML = S.accounts.length ? S.accounts.map(a => `
+  $("acctList").innerHTML = S.accounts.length ? S.accounts.map(a => {
+    const pending = S.bills.filter(b => b.acct === a.id && b.paidMonth !== mk).reduce((s, b) => s + b.amount, 0);
+    return `
     <div class="exp">
-      <span class="ds">${esc(a.name)}</span>
+      <span class="ds">${esc(a.name)}${pending ? ` <span class="dy">🧾 $${pending.toFixed(2)} in bills → $${(a.balance - pending).toFixed(2)} left</span>` : ""}</span>
       <input class="bal-in" data-abal="${a.id}" type="number" step="0.01" value="${a.balance}">
       <button class="x-del" data-adel="${a.id}">×</button>
-    </div>`).join("")
+    </div>`;
+  }).join("")
     : `<p style="color:var(--muted);font-size:13px">Add your accounts and update balances whenever you like — the total shows up top. Numbers stay on this device only.</p>`;
 }
 
@@ -565,15 +584,33 @@ function renderReflection() {
 
 /* ---------- archives ---------- */
 function renderArchives() {
-  $("archList").innerHTML = S.archives.length ? S.archives.slice().reverse().map(a => `
-    <div class="arch">
+  if (!S.archives.length) {
+    $("archList").innerHTML = `<p style="color:var(--muted);font-size:13px;padding:8px 0">Nothing archived yet — finish your first week!</p>`;
+    return;
+  }
+  const avg = Math.round(S.archives.reduce((a, x) => a + x.score, 0) / S.archives.length);
+  const best = S.archives.reduce((a, x) => x.score > a.score ? x : a);
+  const lastFocus = S.archives[S.archives.length - 1].refl && S.archives[S.archives.length - 1].refl.focus;
+  const head = `<div class="arch-sum">📖 <b>${S.archives.length}</b> week${S.archives.length > 1 ? "s" : ""} tracked · average score <b>${avg}%</b> · best week <b>${best.label}</b> (${best.score}%)${lastFocus ? `<br>🧭 Focus you set last week: <i>${esc(lastFocus)}</i>` : ""}</div>`;
+  $("archList").innerHTML = head + S.archives.slice().reverse().map(a => {
+    const r = a.refl || {};
+    const wins = r.wins || a.wins || "";
+    const stats = `
       <span><b>${a.label}</b></span>
       <span>score ${a.score}%</span>
       <span>✅ ${a.tasksDone}/${a.tasksTotal} tasks</span>
       <span>🔁 ${a.habitPct}% habits</span>
-      <span>💸 $${a.spent.toFixed(2)}</span>
-      ${a.wins ? `<span class="aw">“${esc(a.wins)}”</span>` : ""}
-    </div>`).join("") : `<p style="color:var(--muted);font-size:13px;padding:8px 0">Nothing archived yet — finish your first week!</p>`;
+      <span>💸 $${a.spent.toFixed(2)}</span>`;
+    return (wins || r.hard || r.focus) ? `
+    <details class="arch-x">
+      <summary class="arch">${stats}<span class="aw">reflection ▾</span></summary>
+      <div class="arch-refl">
+        ${wins ? `<p>🏆 <b>Wins:</b> ${esc(wins)}</p>` : ""}
+        ${r.hard ? `<p>🌧️ <b>Hard:</b> ${esc(r.hard)}</p>` : ""}
+        ${r.focus ? `<p>🧭 <b>Focus set:</b> ${esc(r.focus)}</p>` : ""}
+      </div>
+    </details>` : `<div class="arch">${stats}</div>`;
+  }).join("");
 }
 
 function renderAll() {
@@ -595,7 +632,8 @@ function startNewWeek() {
     tasksDone: done, tasksTotal: total,
     habitPct: hTotal ? Math.round(hDone / hTotal * 100) : 0,
     spent: S.expenses.reduce((a, e) => a + e.amount, 0),
-    wins: S.reflection.wins.trim().slice(0, 120)
+    wins: S.reflection.wins.trim().slice(0, 120),
+    refl: { wins: S.reflection.wins.trim(), hard: S.reflection.hard.trim(), focus: S.reflection.focus.trim() }
   });
   if (S.archives.length > 52) S.archives.shift();
   S = freshWeek(iso(mondayOf(new Date())), S);
@@ -734,9 +772,9 @@ function addBill() {
   const n = $("billName").value.trim(), a = +$("billAmt").value;
   const d = Math.min(31, Math.max(1, Math.round(+$("billDue").value || 1)));
   if (!n || !(a > 0)) return;
-  S.bills.push({ id: uid(), name: n, amount: a, due: d, paidMonth: "" });
-  $("billName").value = ""; $("billAmt").value = ""; $("billDue").value = "";
-  save(); renderBills();
+  S.bills.push({ id: uid(), name: n, amount: a, due: d, paidMonth: "", acct: $("billAcct").value });
+  $("billName").value = ""; $("billAmt").value = ""; $("billDue").value = ""; $("billAcct").value = "";
+  save(); renderBills(); renderAccounts();
 }
 $("billAdd").onclick = addBill;
 ["billName", "billAmt", "billDue"].forEach(id => $(id).addEventListener("keydown", e => { if (e.key === "Enter") addBill(); }));
@@ -744,11 +782,18 @@ $("billList").addEventListener("click", e => {
   const pay = e.target.closest("[data-bpay]");
   if (pay) {
     const b = S.bills.find(x => x.id === pay.dataset.bpay);
-    b.paidMonth = b.paidMonth === monthKey() ? "" : monthKey();
-    save(); renderBills(); return;
+    const acct = S.accounts.find(a => a.id === b.acct);
+    if (b.paidMonth === monthKey()) {
+      b.paidMonth = "";
+      if (acct) acct.balance = Math.round((acct.balance + b.amount) * 100) / 100;
+    } else {
+      b.paidMonth = monthKey();
+      if (acct) acct.balance = Math.round((acct.balance - b.amount) * 100) / 100;
+    }
+    save(); renderBills(); renderAccounts(); return;
   }
   const del = e.target.closest("[data-bdel]");
-  if (del && confirm("Remove this bill?")) { S.bills = S.bills.filter(x => x.id !== del.dataset.bdel); save(); renderBills(); }
+  if (del && confirm("Remove this bill?")) { S.bills = S.bills.filter(x => x.id !== del.dataset.bdel); save(); renderBills(); renderAccounts(); }
 });
 
 function addAcct() {
@@ -766,7 +811,7 @@ $("acctList").addEventListener("change", e => {
 });
 $("acctList").addEventListener("click", e => {
   const del = e.target.closest("[data-adel]");
-  if (del && confirm("Remove this account?")) { S.accounts = S.accounts.filter(a => a.id !== del.dataset.adel); save(); renderAccounts(); }
+  if (del && confirm("Remove this account?")) { S.accounts = S.accounts.filter(a => a.id !== del.dataset.adel); save(); renderAccounts(); renderBills(); }
 });
 
 [["reflWins", "wins"], ["reflHard", "hard"], ["reflFocus", "focus"]].forEach(([id, k]) => {
