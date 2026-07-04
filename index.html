@@ -184,6 +184,11 @@
   .exp .ds { flex: 1; }
   .exp .am { font-weight: 600; }
   .exp .dy { color: var(--muted); font-size: 11px; }
+  .due-soon { color: var(--amber) !important; font-weight: 600; }
+  .overdue { color: var(--red) !important; font-weight: 600; }
+  .paid-bill { text-decoration: line-through; color: var(--muted); }
+  .bal-in { width: 96px; border: 1px solid var(--border); background: var(--bg); color: var(--text); border-radius: 8px; padding: 4px 6px; font-size: 13px; font-weight: 600; text-align: right; outline: none; }
+  .bal-in:focus { border-color: var(--accent); }
 
   /* ---------- reflection ---------- */
   .refl-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
@@ -284,6 +289,29 @@
     </div>
   </div>
 
+  <div class="row-mid">
+    <div class="card">
+      <h2>🧾 Bills <span id="billsSummary" style="color:var(--muted);font-weight:400;font-size:12px"></span></h2>
+      <div id="billList"></div>
+      <div class="add-inline">
+        <input id="billName" placeholder="Bill (e.g. Rent, Internet)">
+        <input id="billAmt" type="number" min="0" step="0.01" placeholder="$" style="flex:0 0 78px">
+        <input id="billDue" type="number" min="1" max="31" placeholder="day" title="Due day of month" style="flex:0 0 62px">
+        <button class="mini-btn" id="billAdd">Add</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🏦 Bank accounts <span id="acctTotal" style="float:right;color:var(--green)"></span></h2>
+      <div id="acctList"></div>
+      <div class="add-inline">
+        <input id="acctName" placeholder="Account (e.g. Chase checking)">
+        <input id="acctBal" type="number" step="0.01" placeholder="$" style="flex:0 0 96px">
+        <button class="mini-btn" id="acctAdd">Add</button>
+      </div>
+    </div>
+  </div>
+
   <div class="card">
     <h2>🧠 Weekly reflection</h2>
     <div class="refl-grid">
@@ -339,6 +367,8 @@ function freshWeek(weekStartIso, prev) {
     learning: prev ? prev.learning.map(l => ({ id: l.id, name: l.name, target: l.target, mins: 0 })) : [],
     budget: prev ? prev.budget : 200,
     expenses: [],
+    bills: prev ? prev.bills : [],
+    accounts: prev ? prev.accounts : [],
     reflection: { wins: "", hard: "", focus: "" },
     archives: prev ? prev.archives : [],
     theme: prev ? prev.theme : (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
@@ -350,6 +380,8 @@ try { S = JSON.parse(localStorage.getItem(KEY)); } catch (e) { S = null; }
 if (!S || !S.weekStart) S = freshWeek(iso(mondayOf(new Date())));
 if (!Array.isArray(S.mood)) S.mood = Array(7).fill(0);
 if (typeof S.notes !== "string") S.notes = "";
+if (!Array.isArray(S.bills)) S.bills = [];
+if (!Array.isArray(S.accounts)) S.accounts = [];
 
 const $ = id => document.getElementById(id);
 const save = () => localStorage.setItem(KEY, JSON.stringify(S));
@@ -486,6 +518,43 @@ function renderMoney() {
     </div>`).join("");
 }
 
+/* ---------- bills ---------- */
+const monthKey = () => iso(new Date()).slice(0, 7);
+function ord(n) { const s = ["th", "st", "nd", "rd"], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); }
+function renderBills() {
+  const mk = monthKey(), today = new Date().getDate();
+  const unpaid = S.bills.filter(b => b.paidMonth !== mk);
+  const due = unpaid.reduce((a, b) => a + b.amount, 0);
+  $("billsSummary").textContent = S.bills.length
+    ? (unpaid.length ? "— $" + due.toFixed(2) + " still due this month" : "— all paid this month 🎉") : "";
+  $("billList").innerHTML = S.bills.length ? S.bills.slice().sort((a, b) => a.due - b.due).map(b => {
+    const paid = b.paidMonth === mk;
+    let cls = "", note = "due " + ord(b.due);
+    if (!paid && b.due < today) { cls = "overdue"; note = "overdue — was due " + ord(b.due); }
+    else if (!paid && b.due - today <= 7) { cls = "due-soon"; note = "due " + ord(b.due) + " · soon"; }
+    return `
+    <div class="exp">
+      <div class="check ${paid ? "on" : ""}" data-bpay="${b.id}" style="width:18px;height:18px;border-radius:6px;font-size:11px" title="Mark paid">${paid ? "✓" : ""}</div>
+      <span class="ds ${paid ? "paid-bill" : ""}">${esc(b.name)} <span class="dy ${cls}">${note}</span></span>
+      <span class="am">$${b.amount.toFixed(2)}</span>
+      <button class="x-del" data-bdel="${b.id}">×</button>
+    </div>`;
+  }).join("") : `<p style="color:var(--muted);font-size:13px">Add your recurring bills — they reset to unpaid each month, and you'll get a warning when one is due soon.</p>`;
+}
+
+/* ---------- accounts ---------- */
+function renderAccounts() {
+  const total = S.accounts.reduce((a, c) => a + c.balance, 0);
+  $("acctTotal").textContent = S.accounts.length ? "$" + total.toFixed(2) : "";
+  $("acctList").innerHTML = S.accounts.length ? S.accounts.map(a => `
+    <div class="exp">
+      <span class="ds">${esc(a.name)}</span>
+      <input class="bal-in" data-abal="${a.id}" type="number" step="0.01" value="${a.balance}">
+      <button class="x-del" data-adel="${a.id}">×</button>
+    </div>`).join("")
+    : `<p style="color:var(--muted);font-size:13px">Add your accounts and update balances whenever you like — the total shows up top. Numbers stay on this device only.</p>`;
+}
+
 /* ---------- reflection ---------- */
 function renderReflection() {
   $("reflWins").value = S.reflection.wins;
@@ -509,8 +578,8 @@ function renderArchives() {
 
 function renderAll() {
   renderHeader(); renderPriorities(); renderPlanner(); renderHabits();
-  renderHealth(); renderLearning(); renderMoney(); renderReflection();
-  renderArchives(); renderScore();
+  renderHealth(); renderLearning(); renderMoney(); renderBills();
+  renderAccounts(); renderReflection(); renderArchives(); renderScore();
 }
 
 /* ---------- new week ---------- */
@@ -659,6 +728,45 @@ $("expDesc").addEventListener("keydown", e => { if (e.key === "Enter") addExp();
 $("expList").addEventListener("click", e => {
   const del = e.target.closest("[data-edel]");
   if (del) { S.expenses = S.expenses.filter(x => x.id !== del.dataset.edel); save(); renderMoney(); }
+});
+
+function addBill() {
+  const n = $("billName").value.trim(), a = +$("billAmt").value;
+  const d = Math.min(31, Math.max(1, Math.round(+$("billDue").value || 1)));
+  if (!n || !(a > 0)) return;
+  S.bills.push({ id: uid(), name: n, amount: a, due: d, paidMonth: "" });
+  $("billName").value = ""; $("billAmt").value = ""; $("billDue").value = "";
+  save(); renderBills();
+}
+$("billAdd").onclick = addBill;
+["billName", "billAmt", "billDue"].forEach(id => $(id).addEventListener("keydown", e => { if (e.key === "Enter") addBill(); }));
+$("billList").addEventListener("click", e => {
+  const pay = e.target.closest("[data-bpay]");
+  if (pay) {
+    const b = S.bills.find(x => x.id === pay.dataset.bpay);
+    b.paidMonth = b.paidMonth === monthKey() ? "" : monthKey();
+    save(); renderBills(); return;
+  }
+  const del = e.target.closest("[data-bdel]");
+  if (del && confirm("Remove this bill?")) { S.bills = S.bills.filter(x => x.id !== del.dataset.bdel); save(); renderBills(); }
+});
+
+function addAcct() {
+  const n = $("acctName").value.trim();
+  if (!n) return;
+  S.accounts.push({ id: uid(), name: n, balance: +$("acctBal").value || 0 });
+  $("acctName").value = ""; $("acctBal").value = "";
+  save(); renderAccounts();
+}
+$("acctAdd").onclick = addAcct;
+["acctName", "acctBal"].forEach(id => $(id).addEventListener("keydown", e => { if (e.key === "Enter") addAcct(); }));
+$("acctList").addEventListener("change", e => {
+  const inp = e.target.closest("[data-abal]");
+  if (inp) { S.accounts.find(a => a.id === inp.dataset.abal).balance = +inp.value || 0; save(); renderAccounts(); }
+});
+$("acctList").addEventListener("click", e => {
+  const del = e.target.closest("[data-adel]");
+  if (del && confirm("Remove this account?")) { S.accounts = S.accounts.filter(a => a.id !== del.dataset.adel); save(); renderAccounts(); }
 });
 
 [["reflWins", "wins"], ["reflHard", "hard"], ["reflFocus", "focus"]].forEach(([id, k]) => {
