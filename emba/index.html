@@ -1,0 +1,648 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="A 78-week self-study EMBA curriculum: 8 blocks, 15 modules, texts, cases and checkable weekly work.">
+<meta name="theme-color" content="#F5F6F1">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" href="icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="EMBA">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>The Self-Taught EMBA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+:root{
+  --paper:#F5F6F1;
+  --card:#FBFCF8;
+  --band:#E6EEE4;
+  --ink:#15201B;
+  --ink-2:#5A6961;
+  --ink-3:#8A968E;
+  --rule:#C9D3C7;
+  --rule-soft:#DEE5DB;
+  --accent:#115C46;
+  --accent-soft:#D5E6DD;
+  --amber:#8A5B0C;
+  --shadow:0 1px 0 rgba(21,32,27,.05);
+  --done:#115C46;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#11150F;
+    --card:#171C17;
+    --band:#1D241D;
+    --ink:#E8ECE2;
+    --ink-2:#A0AC9F;
+    --ink-3:#77837799;
+    --ink-3:#788075;
+    --rule:#2E372E;
+    --rule-soft:#242C24;
+    --accent:#5FC49F;
+    --accent-soft:#1E3A30;
+    --amber:#D5A048;
+    --shadow:none;
+    --done:#5FC49F;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#11150F;
+  --card:#171C17;
+  --band:#1D241D;
+  --ink:#E8ECE2;
+  --ink-2:#A0AC9F;
+  --ink-3:#788075;
+  --rule:#2E372E;
+  --rule-soft:#242C24;
+  --accent:#5FC49F;
+  --accent-soft:#1E3A30;
+  --amber:#D5A048;
+  --shadow:none;
+  --done:#5FC49F;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  font-size:16px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1080px;margin:0 auto;padding:clamp(28px,5vw,64px) clamp(18px,4vw,40px) 96px}
+
+/* ── masthead ───────────────────────────────── */
+.mast{display:flex;flex-direction:column;gap:22px;padding-bottom:26px;border-bottom:2px solid var(--ink)}
+.eyebrow{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--accent);font-weight:500;
+}
+h1{
+  font-family:"Zilla Slab",Georgia,serif;
+  font-weight:700;
+  font-size:clamp(2.3rem,6.2vw,3.9rem);
+  line-height:1.02;letter-spacing:-.018em;
+  margin:0;text-wrap:balance;
+}
+.standfirst{
+  font-size:clamp(1.02rem,2.1vw,1.16rem);
+  color:var(--ink-2);max-width:62ch;margin:0;
+}
+.standfirst em{color:var(--ink);font-style:italic}
+
+.vitals{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(116px,1fr));
+  gap:2px;background:var(--rule);border:1px solid var(--rule);
+}
+.vital{background:var(--paper);padding:11px 14px 12px}
+.vital dt{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--ink-3);margin:0 0 3px;
+}
+.vital dd{
+  margin:0;font-family:"Zilla Slab",Georgia,serif;font-weight:600;
+  font-size:1.28rem;font-variant-numeric:tabular-nums;line-height:1.15;
+}
+.vital dd small{font-size:.78rem;font-weight:500;color:var(--ink-2);font-family:"Source Sans 3",sans-serif}
+
+/* ── progress meter ─────────────────────────── */
+.meter{
+  position:sticky;top:0;z-index:20;
+  background:var(--paper);
+  border-bottom:1px solid var(--rule);
+  padding:12px 0 11px;margin-bottom:6px;
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+}
+.meter-track{
+  flex:1 1 200px;height:9px;background:var(--rule-soft);
+  border:1px solid var(--rule);position:relative;overflow:hidden;
+}
+.meter-fill{
+  position:absolute;inset:0 auto 0 0;width:0%;
+  background:var(--accent);transition:width .32s ease;
+}
+.meter-read{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:12.5px;font-variant-numeric:tabular-nums;color:var(--ink-2);
+  white-space:nowrap;
+}
+.meter-read b{color:var(--ink);font-weight:500}
+.sync{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink-3);white-space:nowrap;
+}
+.sync[data-state="live"]{color:var(--accent)}
+
+/* ── method note ────────────────────────────── */
+.method{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:0;border:1px solid var(--rule);margin:34px 0 46px;background:var(--card);
+}
+.method > div{padding:16px 18px 18px;border-right:1px solid var(--rule-soft)}
+.method > div:last-child{border-right:0}
+.method h3{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent);margin:0 0 7px;font-weight:500;
+}
+.method p{margin:0;font-size:14.5px;color:var(--ink-2);line-height:1.5}
+.method p strong{color:var(--ink);font-weight:600}
+
+/* ── blocks ─────────────────────────────────── */
+.block{margin-bottom:52px}
+.block-head{
+  display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+  padding-bottom:9px;border-bottom:1.5px solid var(--ink);margin-bottom:0;
+}
+.block-no{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:12px;font-weight:500;letter-spacing:.1em;
+  color:var(--paper);background:var(--ink);
+  padding:3px 8px 4px;
+}
+.block-title{
+  font-family:"Zilla Slab",Georgia,serif;font-weight:600;
+  font-size:1.3rem;letter-spacing:-.01em;margin:0;flex:1 1 auto;
+}
+.block-span{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:12px;color:var(--ink-2);font-variant-numeric:tabular-nums;
+}
+.block-count{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:12px;font-variant-numeric:tabular-nums;color:var(--ink-3);
+}
+.block-count.full{color:var(--accent)}
+
+.modules{display:grid;grid-template-columns:1fr;gap:0}
+
+.module{
+  display:grid;grid-template-columns:150px 1fr;
+  border-bottom:1px solid var(--rule);
+  background:var(--card);
+}
+.module:first-child{border-top:0}
+.rail{
+  padding:20px 16px 22px;border-right:1px solid var(--rule-soft);
+  display:flex;flex-direction:column;gap:9px;
+}
+.code{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:13.5px;font-weight:500;letter-spacing:.02em;color:var(--accent);
+}
+.rail dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:2px 8px;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;
+  font-variant-numeric:tabular-nums;color:var(--ink-3);}
+.rail dt{margin:0}
+.rail dd{margin:0;color:var(--ink-2);text-align:right}
+.track{
+  margin-top:auto;padding-top:12px;
+  display:flex;align-items:center;gap:8px;
+}
+.track-bar{flex:1;height:4px;background:var(--rule-soft);position:relative;overflow:hidden}
+.track-bar i{position:absolute;inset:0 auto 0 0;width:0;background:var(--done);transition:width .28s ease;display:block}
+.track-n{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;
+  font-variant-numeric:tabular-nums;color:var(--ink-3);
+}
+
+.body{padding:20px 22px 22px}
+.module h4{
+  font-family:"Zilla Slab",Georgia,serif;font-weight:600;
+  font-size:1.24rem;line-height:1.2;margin:0 0 8px;letter-spacing:-.008em;
+  text-wrap:balance;
+}
+.exit{
+  margin:0 0 14px;font-size:15px;color:var(--ink-2);max-width:64ch;
+}
+.exit b{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:500;display:block;margin-bottom:2px;
+}
+.sources{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:12px 20px;margin:0 0 16px;padding:12px 14px;
+  border-left:2px solid var(--accent-soft);background:var(--band);
+}
+.src{margin:0}
+.src b{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent);font-weight:500;display:block;margin-bottom:2px;
+}
+.src span{font-size:14px;color:var(--ink-2);line-height:1.45;display:block}
+.src cite{font-style:italic;color:var(--ink)}
+
+.work{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule-soft)}
+.work li{border-bottom:1px solid var(--rule-soft)}
+.work li:nth-child(odd){background:var(--band)}
+.work label{
+  display:grid;grid-template-columns:auto 1fr;gap:11px;align-items:start;
+  padding:9px 11px;cursor:pointer;font-size:14.5px;line-height:1.45;
+}
+.work input{
+  appearance:none;-webkit-appearance:none;
+  width:15px;height:15px;margin:3px 0 0;flex:none;
+  border:1.5px solid var(--ink-3);background:transparent;
+  cursor:pointer;position:relative;border-radius:1px;
+}
+.work input:checked{background:var(--done);border-color:var(--done)}
+.work input:checked::after{
+  content:"";position:absolute;left:4px;top:.5px;width:4px;height:9px;
+  border:solid var(--card);border-width:0 1.7px 1.7px 0;transform:rotate(43deg);
+}
+.work input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.work input:checked + span{color:var(--ink-3);text-decoration:line-through;text-decoration-thickness:1px}
+.work label span{transition:color .18s ease}
+
+/* ── footer ─────────────────────────────────── */
+.notes{
+  margin-top:20px;padding-top:22px;border-top:2px solid var(--ink);
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px 34px;
+}
+.notes h3{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent);margin:0 0 6px;font-weight:500;
+}
+.notes p{margin:0 0 8px;font-size:14.5px;color:var(--ink-2)}
+.notes p:last-child{margin-bottom:0}
+.notes strong{color:var(--ink);font-weight:600}
+.reset{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;
+  letter-spacing:.1em;text-transform:uppercase;
+  background:transparent;color:var(--ink-3);
+  border:1px solid var(--rule);padding:7px 12px;cursor:pointer;
+  margin-top:10px;
+}
+.reset:hover{color:var(--ink);border-color:var(--ink-2)}
+.reset:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+@media (max-width:720px){
+  .module{grid-template-columns:1fr}
+  .rail{
+    border-right:0;border-bottom:1px solid var(--rule-soft);
+    flex-direction:row;align-items:center;gap:14px;flex-wrap:wrap;
+    padding:12px 16px;
+  }
+  .rail dl{grid-template-columns:auto auto auto auto;gap:0 6px}
+  .rail dd{text-align:left}
+  .track{margin-top:0;padding-top:0;flex:1 1 110px;min-width:110px}
+  .body{padding:16px 16px 18px}
+  .method > div{border-right:0;border-bottom:1px solid var(--rule-soft)}
+  .method > div:last-child{border-bottom:0}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+
+  <header class="mast">
+    <div class="eyebrow">Independent study &middot; 78 weeks &middot; No cohort, no tuition</div>
+    <h1>The Self-Taught EMBA</h1>
+    <p class="standfirst">Eight ten-week blocks, each pairing one <em>analytical</em> module with one <em>judgment</em> module — the way real programmes run them, because the numbers and the argument are learned against each other. Tick the work as you finish it; progress is kept in this browser.</p>
+    <dl class="vitals">
+      <div class="vital"><dt>Modules</dt><dd>15</dd></div>
+      <div class="vital"><dt>Blocks</dt><dd>8</dd></div>
+      <div class="vital"><dt>Duration</dt><dd>78 <small>weeks</small></dd></div>
+      <div class="vital"><dt>Contact hours</dt><dd>624</dd></div>
+      <div class="vital"><dt>Weekly load</dt><dd>8 <small>hrs</small></dd></div>
+      <div class="vital"><dt>Written work</dt><dd>15 <small>memos</small></dd></div>
+    </dl>
+  </header>
+
+  <div class="meter">
+    <span class="meter-read"><b id="pct">0%</b> complete &middot; <span id="frac">0 / 61</span> items</span>
+    <span class="meter-track"><span class="meter-fill" id="fill"></span></span>
+    <span class="sync" id="sync">Local only</span>
+  </div>
+
+  <section class="method">
+    <div>
+      <h3>Cases, not chapters</h3>
+      <p>The learning is in the argument. Harvard Business Publishing, Ivey and Darden sell single cases to individuals for roughly <strong>$9–11</strong>. Write your two-page recommendation <strong>before</strong> you read the teaching note.</p>
+    </div>
+    <div>
+      <h3>Your own P&amp;L is the cohort</h3>
+      <p>An EMBA's real value is fifty classmates arguing from fifty balance sheets. Alone, substitute <strong>your employer</strong>: value it, model its unit economics, run every framework against it.</p>
+    </div>
+    <div>
+      <h3>If you only do four</h3>
+      <p><strong>ACC&nbsp;501, FIN&nbsp;521, STR&nbsp;531, NEG&nbsp;561.</strong> Those four carry most of what an EMBA actually changes about how you work. The rest deepens; these four convert.</p>
+    </div>
+  </section>
+
+  <main id="blocks"></main>
+
+  <section class="notes">
+    <div>
+      <h3>Sourcing the materials</h3>
+      <p>Prior editions of the textbooks cost a fraction of current ones and differ trivially — buy used. Damodaran publishes his full NYU valuation course, slides and spreadsheets free at <strong>pages.stern.nyu.edu/~adamodar</strong>. Filings come free from EDGAR.</p>
+    </div>
+    <div>
+      <h3>The part you cannot buy</h3>
+      <p>You can replicate the curriculum, not the room. Compensate deliberately: find three people who will read your memos and argue back, and present the capstone to them out loud. A recommendation nobody has attacked has not been tested.</p>
+    </div>
+    <div>
+      <h3>Progress</h3>
+      <p>Ticks are stored in this browser, on this device. Clearing site data clears them. Add the page to your home screen to keep it one tap away.</p>
+      <button class="reset" id="reset" type="button">Clear all progress</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+const BLOCKS = [
+  {n:1, span:"Weeks 1–10", theme:"Read the numbers", modules:[
+    {code:"ACC 501", title:"Financial Accounting", wk:"1–10", hrs:40,
+     exit:"Read a 10-K without the summary, and trace a dollar of revenue through all three statements.",
+     texts:"Ittelson, <cite>Financial Statements</cite> → Fridson &amp; Alvarez, <cite>Financial Statement Analysis</cite>, ch. 1–8",
+     caseLabel:"Case", caseText:"Your employer's — or its closest competitor's — latest annual report, read cover to cover, footnotes included.",
+     work:["Build three statements for a small business from raw transactions, by hand",
+           "Trace an inventory change from the balance sheet through to cash flow",
+           "Read one complete 10-K, including the notes and MD&A",
+           "Write a two-page quality-of-earnings note on that filing"]},
+    {code:"DEC 511", title:"Statistics for Decision Making", wk:"1–10", hrs:40,
+     exit:"Separate a real effect from noise, and know what a regression coefficient does not license you to claim.",
+     texts:"Wheelan, <cite>Naked Statistics</cite> → Sharpe &amp; De Veaux, <cite>Business Statistics</cite>, ch. 1–18",
+     caseLabel:"Practicum", caseText:"One regression built in a spreadsheet on data from your own function — not a textbook dataset.",
+     work:["Sampling error and confidence intervals, worked until the arithmetic is automatic",
+           "Run a multiple regression and inspect the residuals before believing it",
+           "Design an A/B test and compute the sample size before it starts",
+           "Write one finding up for an executive who will not read the method"]}
+  ]},
+  {n:2, span:"Weeks 11–20", theme:"Price the future", modules:[
+    {code:"FIN 521", title:"Corporate Finance &amp; Valuation", wk:"11–20", hrs:40,
+     exit:"Value a company from its filings and defend the discount rate to someone who disagrees.",
+     texts:"Damodaran, <cite>Applied Corporate Finance</cite>, alongside his free NYU MBA lecture series",
+     caseLabel:"Practicum", caseText:"A full discounted-cash-flow model of one listed company, built from primary filings.",
+     work:["NPV, IRR and payback — twenty problems until the mechanics are reflex",
+           "Estimate a WACC from market data rather than a textbook table",
+           "Build a five-year DCF with an explicit, stated terminal-value assumption",
+           "Stress it: identify the single assumption that moves value most"]},
+    {code:"ECO 505", title:"Managerial Economics", wk:"11–20", hrs:40,
+     exit:"Anticipate how a rival responds before you move on price or capacity.",
+     texts:"Dixit &amp; Nalebuff, <cite>The Art of Strategy</cite> → Baye &amp; Prince, <cite>Managerial Economics</cite>, ch. 1–11",
+     caseLabel:"Practicum", caseText:"One live competitive interaction in your industry, mapped as a game with payoffs.",
+     work:["Estimate price elasticity for one product you actually sell",
+           "Map where pricing power sits along your industry's value chain",
+           "Solve the standard games: entry, capacity, price war, commitment",
+           "Name one credible commitment your firm could make, and price it"]}
+  ]},
+  {n:3, span:"Weeks 21–30", theme:"Cost and position", modules:[
+    {code:"ACC 512", title:"Managerial &amp; Cost Accounting", wk:"21–30", hrs:40,
+     exit:"Know what a unit truly costs, and which costs a decision may legitimately ignore.",
+     texts:"Horngren, <cite>Cost Accounting</cite>, ch. 1–14 → Goldratt, <cite>The Goal</cite>, for the intuition",
+     caseLabel:"Practicum", caseText:"A unit-economics model for one real product or service line, down to contribution margin.",
+     work:["Separate fixed, variable and sunk — then kill one sunk-cost argument at work",
+           "Build a contribution-margin model with a break-even volume",
+           "Apply activity-based costing to a process you already know well",
+           "Set a defensible transfer price between two internal units"]},
+    {code:"STR 531", title:"Competitive Strategy", wk:"21–30", hrs:40,
+     exit:"State your firm's advantage in one sentence, and name what would destroy it.",
+     texts:"Rumelt, <cite>Good Strategy / Bad Strategy</cite> → Porter, <cite>Competitive Strategy</cite>, ch. 1–7",
+     caseLabel:"Case", caseText:"One purchased case per week; memo written before the teaching note is opened.",
+     work:["Five forces and a value-chain analysis of your own industry",
+           "Distinguish business-unit strategy from corporate portfolio strategy",
+           "Write a one-page strategy: diagnosis, guiding policy, coherent actions",
+           "List the three developments that would invalidate it"]}
+  ]},
+  {n:4, span:"Weeks 31–40", theme:"Demand and delivery", modules:[
+    {code:"MKT 515", title:"Marketing Management", wk:"31–40", hrs:40,
+     exit:"Price and position a product using numbers rather than adjectives.",
+     texts:"Kotler &amp; Keller, <cite>Marketing Management</cite> (skimmed for structure) → Farris et al., <cite>Marketing Metrics</cite>",
+     caseLabel:"Practicum", caseText:"A segmentation and lifetime-value model for a real customer base you can get data on.",
+     work:["Segment a real customer base and size each segment in revenue",
+           "Compute CAC, lifetime value and payback period for one channel",
+           "Compare value-based, cost-plus and competitive pricing on one product",
+           "Write a positioning statement and the evidence that supports it"]},
+    {code:"OPS 541", title:"Operations &amp; Supply Chain", wk:"31–40", hrs:40,
+     exit:"Find the bottleneck, and say what the inventory is actually buying you.",
+     texts:"Cachon &amp; Terwiesch, <cite>Matching Supply with Demand</cite> → Goldratt for the narrative version",
+     caseLabel:"Practicum", caseText:"A process map with measured cycle times for a workflow you personally own.",
+     work:["Map a real process; compute capacity, utilisation and flow time",
+           "Apply Little's Law to a queue in your own operation",
+           "Set a stocking level under demand uncertainty (the newsvendor problem)",
+           "Identify the bottleneck and cost out one hour of its downtime"]}
+  ]},
+  {n:5, span:"Weeks 41–50", theme:"People, and the table", modules:[
+    {code:"LED 551", title:"Leading Organizations", wk:"41–50", hrs:40,
+     exit:"Diagnose why a group underperforms before you rearrange the org chart.",
+     texts:"Edmondson, <cite>The Fearless Organization</cite> → Bolman &amp; Deal, <cite>Reframing Organizations</cite>",
+     caseLabel:"Practicum", caseText:"A written diagnosis of one team you lead or belong to, shown to someone in it.",
+     work:["Read one team through all four frames: structural, human, political, symbolic",
+           "Design a role and its incentives, then predict how they will be gamed",
+           "Run one real change initiative through an explicit eight-step plan",
+           "Collect 360° feedback on yourself and write down what you will change"]},
+    {code:"NEG 561", title:"Negotiations", wk:"41–50", hrs:40,
+     exit:"Arrive knowing your BATNA, their interests, and where value can be created rather than split.",
+     texts:"Malhotra &amp; Bazerman, <cite>Negotiation Genius</cite> → Fisher &amp; Ury, <cite>Getting to Yes</cite>",
+     caseLabel:"Practicum", caseText:"Three real negotiations, each run from a written prep sheet and debriefed afterwards.",
+     work:["Write a full prep sheet: BATNA, reservation price, ZOPA, their interests",
+           "Practise value creation: multi-issue trades and contingent contracts",
+           "Run three live negotiations and debrief each one in writing",
+           "Meet one hard tactic — anchor, deadline, ultimatum — deliberately"]}
+  ]},
+  {n:6, span:"Weeks 51–60", theme:"Deals and technology", modules:[
+    {code:"FIN 575", title:"M&amp;A and Corporate Development", wk:"51–60", hrs:40,
+     exit:"Say what a deal is worth to you — which is not what it is worth to the market.",
+     texts:"Bruner, <cite>Applied Mergers and Acquisitions</cite> (selected chapters) → Rosenbaum &amp; Pearl, <cite>Investment Banking</cite>",
+     caseLabel:"Case", caseText:"One recent transaction in your own sector, analysed end to end from public documents.",
+     work:["Build a comparables and precedent-transactions valuation",
+           "Model synergies separately from standalone value, and discount them harder",
+           "Work the structure: cash versus stock, earn-outs, reps and warranties",
+           "Write the first-hundred-days integration plan"]},
+    {code:"TEC 571", title:"Digital &amp; Technology Strategy", wk:"51–60", hrs:40,
+     exit:"Judge a technology investment on its economics rather than on the demo.",
+     texts:"Parker, Van Alstyne &amp; Choudary, <cite>Platform Revolution</cite> → Agrawal et al., <cite>Prediction Machines</cite>",
+     caseLabel:"Practicum", caseText:"A build-versus-buy-versus-partner recommendation for one real system in your organisation.",
+     work:["Analyse one platform business: network effects, multi-homing, take rate",
+           "Write the build/buy/partner recommendation with numbers attached",
+           "Scope one AI use case: data required, baseline, expected lift, failure mode",
+           "Name the technology risk most likely to obsolete your business model"]}
+  ]},
+  {n:7, span:"Weeks 61–70", theme:"The enterprise view", modules:[
+    {code:"GOV 581", title:"Governance, Ethics &amp; Enterprise Risk", wk:"61–70", hrs:40,
+     exit:"Know what a board is for, and where the pressure to misbehave originates.",
+     texts:"Bazerman &amp; Tenbrunsel, <cite>Blind Spots</cite> → Larcker &amp; Tayan, <cite>Corporate Governance Matters</cite>",
+     caseLabel:"Case", caseText:"Two documented corporate failures traced to root cause — the incentive, not the individual.",
+     work:["Map your firm's governance: board, committees, delegated authorities",
+           "Trace two real failures back to the incentive that produced them",
+           "Build a risk register with likelihood, impact and a named owner per line",
+           "Write the escalation path you would actually use under pressure"]},
+    {code:"GLB 585", title:"Global Markets &amp; Country Risk", wk:"61–70", hrs:40,
+     exit:"Put a defensible number on the risk of operating somewhere you do not control.",
+     texts:"Ghemawat, <cite>Redefining Global Strategy</cite> (the CAGE framework) → Damodaran's country risk premium data",
+     caseLabel:"Practicum", caseText:"A market-entry analysis for one country your firm could plausibly enter next.",
+     work:["Apply the CAGE distance framework to two candidate markets",
+           "Quantify FX exposure across all three types: transaction, translation, economic",
+           "Compare entry modes: export, licence, joint venture, wholly owned",
+           "Price country risk into a discount rate and defend the number"]}
+  ]},
+  {n:8, span:"Weeks 71–78", theme:"Put it together", modules:[
+    {code:"CAP 599", title:"Capstone: A Strategic Audit", wk:"71–78", hrs:64,
+     exit:"Produce the document a board would actually read — and survive being questioned on it.",
+     texts:"No new texts. Every framework from the preceding fourteen modules, applied to one company.",
+     caseLabel:"Subject", caseText:"One company you genuinely care about: your employer, a competitor, or an acquisition target.",
+     work:["Industry and competitive analysis, every claim sourced",
+           "Financial analysis and a valuation with a defended discount rate",
+           "Operating diagnosis: where value leaks out, and why",
+           "A recommendation with an implementation plan, a funding ask and its risks",
+           "Present it aloud to three people who will argue with you"]}
+  ]}
+];
+
+/* ---------- render ---------- */
+const state = Object.create(null);
+const KEY = "emba-registrar-v1";
+const esc = s => s.replace(/&(?!\w+;|#)/g,"&amp;").replace(/</g,"&lt;");
+
+let total = 0;
+const blocksEl = document.getElementById("blocks");
+blocksEl.innerHTML = BLOCKS.map(b => {
+  const count = b.modules.reduce((a,m)=>a+m.work.length,0);
+  total += count;
+  const mods = b.modules.map((m,mi) => {
+    const items = m.work.map((w,wi) => {
+      const id = "b"+b.n+"m"+mi+"i"+wi;
+      return `<li><label><input type="checkbox" data-id="${id}" data-block="${b.n}" data-mod="${b.n}-${mi}"><span>${esc(w)}</span></label></li>`;
+    }).join("");
+    return `<article class="module">
+      <div class="rail">
+        <div class="code">${m.code}</div>
+        <dl><dt>Weeks</dt><dd>${m.wk}</dd><dt>Hours</dt><dd>${m.hrs}</dd></dl>
+        <div class="track" title="Module progress">
+          <span class="track-bar"><i data-modbar="${b.n}-${mi}"></i></span>
+          <span class="track-n" data-modn="${b.n}-${mi}">0/${m.work.length}</span>
+        </div>
+      </div>
+      <div class="body">
+        <h4>${m.title}</h4>
+        <p class="exit"><b>Exit standard</b>${m.exit}</p>
+        <div class="sources">
+          <p class="src"><b>Texts</b><span>${m.texts}</span></p>
+          <p class="src"><b>${m.caseLabel}</b><span>${m.caseText}</span></p>
+        </div>
+        <ul class="work">${items}</ul>
+      </div>
+    </article>`;
+  }).join("");
+  return `<section class="block">
+    <div class="block-head">
+      <span class="block-no">BLOCK ${b.n}</span>
+      <h2 class="block-title">${b.theme}</h2>
+      <span class="block-span">${b.span}</span>
+      <span class="block-count" data-blockn="${b.n}">0/${count}</span>
+    </div>
+    <div class="modules">${mods}</div>
+  </section>`;
+}).join("");
+
+const boxes = [...document.querySelectorAll(".work input")];
+const fill = document.getElementById("fill");
+const pctEl = document.getElementById("pct");
+const fracEl = document.getElementById("frac");
+document.getElementById("frac").textContent = "0 / " + total;
+
+function paint(){
+  let done = 0;
+  const byMod = {}, byBlock = {};
+  for(const el of boxes){
+    const on = !!state[el.dataset.id];
+    if(el.checked !== on) el.checked = on;
+    byMod[el.dataset.mod] = (byMod[el.dataset.mod]||0) + (on?1:0);
+    byBlock[el.dataset.block] = (byBlock[el.dataset.block]||0) + (on?1:0);
+    if(on) done++;
+  }
+  const pct = total ? Math.round(done/total*100) : 0;
+  fill.style.width = pct + "%";
+  pctEl.textContent = pct + "%";
+  fracEl.textContent = done + " / " + total;
+  document.querySelectorAll("[data-modbar]").forEach(bar=>{
+    const k = bar.dataset.modbar;
+    const n = byMod[k]||0;
+    const numEl = document.querySelector(`[data-modn="${k}"]`);
+    const cap = +numEl.textContent.split("/")[1];
+    bar.style.width = (cap? n/cap*100 : 0) + "%";
+    numEl.textContent = n + "/" + cap;
+  });
+  document.querySelectorAll("[data-blockn]").forEach(el=>{
+    const cap = +el.textContent.split("/")[1];
+    const n = byBlock[el.dataset.blockn]||0;
+    el.textContent = n + "/" + cap;
+    el.classList.toggle("full", cap>0 && n===cap);
+  });
+}
+
+/* ---------- persistence ---------- */
+let dbDoc = null, saveTimer = null;
+
+function readLocal(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(raw) Object.assign(state, JSON.parse(raw));
+  }catch(e){}
+}
+function writeLocal(){
+  try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){}
+}
+function scheduleSave(){
+  writeLocal();
+  if(!dbDoc) return;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(()=>{
+    dbDoc.set({items: {...state}, updatedAt: new Date().toISOString()}).catch(()=>{});
+  }, 350);
+}
+
+readLocal();
+paint();
+
+document.addEventListener("change", e => {
+  const el = e.target;
+  if(!el.matches(".work input")) return;
+  if(el.checked) state[el.dataset.id] = true; else delete state[el.dataset.id];
+  paint();
+  scheduleSave();
+});
+
+document.getElementById("reset").addEventListener("click", () => {
+  if(!confirm("Clear every tick on this plan?")) return;
+  for(const k of Object.keys(state)) delete state[k];
+  paint();
+  scheduleSave();
+});
+
+(async () => {
+  const sync = document.getElementById("sync");
+  let db = null;
+  try{ db = window.claude && await window.claude.use("db"); }catch(e){}
+  if(!db){ sync.textContent = "Saved on this device"; return; }
+  dbDoc = db.doc("progress/emba");
+  sync.textContent = "Synced";
+  sync.dataset.state = "live";
+  dbDoc.onSnapshot(snap => {
+    const data = snap.exists ? snap.data() : null;
+    const items = data && data.items && typeof data.items === "object" ? data.items : null;
+    if(!items) { if(Object.keys(state).length) scheduleSave(); return; }
+    for(const k of Object.keys(state)) delete state[k];
+    for(const k of Object.keys(items)) if(items[k]) state[k] = true;
+    writeLocal();
+    paint();
+  }, () => { sync.textContent = "Saved on this device"; delete sync.dataset.state; dbDoc = null; });
+})();
+</script>
+</body>
+</html>
